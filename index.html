@@ -6,144 +6,508 @@
 <title>월드킹 계양점 — 매출 대시보드</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
-:root{--blue:#1a56db;--blue-light:#e8f0fe;--green:#16a34a;--green-light:#dcfce7;--amber:#d97706;--amber-light:#fef3c7;--red:#dc2626;--red-light:#fee2e2;--gray-50:#f9fafb;--gray-100:#f3f4f6;--gray-200:#e5e7eb;--gray-400:#9ca3af;--gray-600:#4b5563;--gray-800:#1f2937;--radius:10px;}
+:root{
+  --primary:#0C447C;--primary-light:#E6F1FB;--primary-mid:#378ADD;
+  --green:#3B6D11;--green-light:#EAF3DE;--green-mid:#639922;
+  --amber:#854F0B;--amber-light:#FAEEDA;--amber-mid:#BA7517;
+  --red:#A32D2D;--red-light:#FCEBEB;--red-mid:#E24B4A;
+  --bg:#F4F6F9;--card:#fff;--border:rgba(0,0,0,0.08);
+  --text:#1a1a1a;--muted:#6B7280;--gray-bg:#F8F9FA;--gray-line:#F1EFE8;
+  --radius:12px;--radius-sm:8px;
+}
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Noto Sans KR',sans-serif;background:#f0f4ff;min-height:100vh;color:var(--gray-800);}
-.container{max-width:800px;margin:0 auto;padding:2rem 1rem;}
-.header{display:flex;align-items:center;gap:12px;margin-bottom:2rem;}
-.dot{width:12px;height:12px;border-radius:50%;background:var(--blue);}
-.header h1{font-size:22px;font-weight:700;}
-.hbadge{background:var(--blue-light);color:var(--blue);font-size:12px;font-weight:500;padding:4px 12px;border-radius:20px;}
-.sec{margin-bottom:1.5rem;}
-.sec-title{font-size:11px;font-weight:700;color:var(--gray-400);letter-spacing:.1em;text-transform:uppercase;margin-bottom:10px;}
-.card{background:#fff;border-radius:var(--radius);box-shadow:0 1px 3px rgba(0,0,0,.07);border:1px solid var(--gray-200);padding:1.25rem;}
-.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
-.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;}
-@media(max-width:600px){.g3,.g4{grid-template-columns:repeat(2,1fr);}}
-.field{display:flex;flex-direction:column;gap:5px;}
-.field label{font-size:12px;color:var(--gray-600);font-weight:500;}
-.field input,.field select{border:1px solid var(--gray-200);border-radius:8px;padding:8px 10px;font-size:14px;font-family:inherit;color:var(--gray-800);background:var(--gray-50);outline:none;transition:border-color .2s;width:100%;}
-.field input:focus,.field select:focus{border-color:var(--blue);background:#fff;}
-.divider{border:none;border-top:1px solid var(--gray-100);margin:1rem 0;}
-.metric{background:var(--gray-50);border-radius:8px;padding:.875rem 1rem;border:1px solid var(--gray-100);}
-.metric .ml{font-size:11px;color:var(--gray-400);font-weight:500;margin-bottom:5px;}
-.metric .mv{font-size:20px;font-weight:700;color:var(--gray-800);}
-.metric .ms{font-size:11px;margin-top:3px;color:var(--gray-400);}
-.prog-bg{background:var(--gray-100);border-radius:6px;height:10px;overflow:hidden;margin:6px 0;}
-.prog-fill{height:100%;border-radius:6px;transition:width .4s ease;}
-.prog-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--gray-400);}
-table{width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
-th{font-size:11px;font-weight:700;color:var(--gray-400);text-align:left;padding:8px;border-bottom:1px solid var(--gray-100);}
-td{padding:10px 8px;border-bottom:1px solid var(--gray-100);color:var(--gray-800);vertical-align:middle;}
+body{font-family:'Noto Sans KR',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.topbar{background:var(--primary);color:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;}
+.topbar-title{font-size:17px;font-weight:700;}
+.topbar-sub{font-size:11px;opacity:.7;margin-top:2px;}
+.topbar-badge{background:rgba(255,255,255,0.15);font-size:11px;padding:3px 10px;border-radius:20px;}
+.tabs{display:flex;background:#fff;border-bottom:1px solid var(--border);padding:0 16px;overflow-x:auto;}
+.tab{padding:12px 16px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;}
+.tab.active{color:var(--primary);border-bottom-color:var(--primary);}
+.page{display:none;}.page.active{display:block;}
+.container{max-width:960px;margin:0 auto;padding:18px 14px;}
+.sec{margin-bottom:18px;}
+.sec-label{font-size:11px;font-weight:700;color:var(--muted);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px;}
+.card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;margin-bottom:12px;}
+.g2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}
+.g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;}
+.g4{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;}
+@media(max-width:600px){.g3,.g4{grid-template-columns:repeat(2,minmax(0,1fr));}}
+.field{display:flex;flex-direction:column;gap:4px;}
+.field label{font-size:12px;color:var(--muted);font-weight:500;}
+.field input,.field select{font-size:14px;padding:7px 10px;border:1px solid var(--border);border-radius:var(--radius-sm);background:var(--gray-bg);color:var(--text);outline:none;font-family:inherit;transition:border-color .2s;}
+.field input:focus,.field select:focus{border-color:var(--primary-mid);background:#fff;}
+.divider{border:none;border-top:1px solid var(--border);margin:12px 0;}
+.metric{background:var(--gray-bg);border-radius:var(--radius-sm);padding:11px 13px;}
+.metric .ml{font-size:11px;color:var(--muted);font-weight:500;margin-bottom:3px;}
+.metric .mv{font-size:19px;font-weight:700;color:var(--text);line-height:1.1;}
+.metric .ms{font-size:11px;margin-top:3px;}
+.prog-wrap{background:var(--gray-line);border-radius:8px;height:10px;overflow:hidden;margin:6px 0;}
+.prog-bar{height:100%;border-radius:8px;transition:width .4s ease;}
+.prog-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-top:3px;}
+table{width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
+th{font-size:11px;font-weight:700;color:var(--muted);padding:7px 8px;border-bottom:2px solid var(--border);text-align:left;background:var(--gray-bg);}
+td{padding:9px 8px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle;}
 tr:last-child td{border-bottom:none;}
-.badge{display:inline-block;font-size:11px;font-weight:700;padding:3px 8px;border-radius:20px;}
-.bs{background:var(--green-light);color:var(--green);}
-.bw{background:var(--amber-light);color:var(--amber);}
+tr:hover td{background:var(--gray-bg);}
+.badge{display:inline-block;font-size:10px;font-weight:700;padding:2px 7px;border-radius:20px;}
 .bd{background:var(--red-light);color:var(--red);}
-.alert{border-radius:10px;padding:.875rem 1rem;margin-bottom:8px;display:flex;gap:10px;align-items:flex-start;}
-.as{background:var(--green-light);}
-.aw{background:var(--amber-light);}
-.ad{background:var(--red-light);}
-.aicon{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;margin-top:1px;color:#fff;}
-.as .aicon{background:var(--green);}
-.aw .aicon{background:var(--amber);}
-.ad .aicon{background:var(--red);}
-.atitle{font-size:13px;font-weight:700;margin-bottom:3px;}
-.as .atitle{color:var(--green);}
-.aw .atitle{color:var(--amber);}
-.ad .atitle{color:var(--red);}
-.abody{font-size:12px;line-height:1.6;color:var(--gray-600);}
-.empty{color:var(--gray-400);text-align:center;padding:1.5rem;font-size:13px;}
-footer{text-align:center;font-size:11px;color:var(--gray-400);margin-top:2rem;padding-bottom:2rem;}
+.bw{background:var(--amber-light);color:var(--amber);}
+.bs{background:var(--green-light);color:var(--green);}
+.alert{border-radius:var(--radius-sm);padding:10px 13px;font-size:13px;line-height:1.6;margin-bottom:7px;display:flex;gap:9px;align-items:flex-start;}
+.ad{background:var(--red-light);border-left:3px solid var(--red-mid);border-radius:0 var(--radius-sm) var(--radius-sm) 0;}
+.aw{background:var(--amber-light);border-left:3px solid var(--amber-mid);border-radius:0 var(--radius-sm) var(--radius-sm) 0;}
+.as{background:var(--green-light);border-left:3px solid var(--green-mid);border-radius:0 var(--radius-sm) var(--radius-sm) 0;}
+.placeholder{color:var(--muted);font-size:13px;text-align:center;padding:18px;}
+.prog-header{display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px;}
+.big-rate{font-weight:700;font-size:20px;}
+.msg-box{background:var(--gray-bg);border-radius:var(--radius-sm);padding:13px 15px;font-size:13px;line-height:1.9;color:var(--text);white-space:pre-wrap;word-break:break-all;border:1px solid var(--border);}
+.copy-btn{margin-top:8px;width:100%;font-size:14px;padding:9px;border-radius:var(--radius-sm);border:none;background:var(--primary);color:#fff;cursor:pointer;font-family:inherit;font-weight:500;transition:opacity .2s;}
+.copy-btn:hover{opacity:.85;}
+.add-btn{font-size:13px;padding:8px 18px;border-radius:var(--radius-sm);border:1px solid var(--primary-mid);background:var(--primary-light);color:var(--primary);cursor:pointer;font-family:inherit;font-weight:500;}
+.add-btn:hover{background:var(--primary-mid);color:#fff;}
+.del-btn{font-size:11px;padding:3px 8px;border-radius:var(--radius-sm);border:1px solid var(--border);background:transparent;color:var(--muted);cursor:pointer;font-family:inherit;}
+.del-btn:hover{background:var(--red-light);color:var(--red);border-color:var(--red-mid);}
+.mini-prog{background:var(--gray-line);border-radius:4px;height:5px;overflow:hidden;margin-top:3px;}
+.mini-bar{height:100%;border-radius:4px;}
+.highlight-card{background:var(--primary-light);border:1px solid rgba(55,138,221,0.2);border-radius:var(--radius);padding:13px 16px;margin-bottom:12px;}
 </style>
 </head>
 <body>
+
+<div class="topbar">
+  <div>
+    <div class="topbar-title">월드킹 계양점</div>
+    <div class="topbar-sub">매출 대시보드</div>
+  </div>
+  <div class="topbar-badge">관리자용</div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" onclick="switchTab('daily')">일일 보고</div>
+  <div class="tab" onclick="switchTab('record')">일자별 기록</div>
+  <div class="tab" onclick="switchTab('monthly')">월 목표 관리</div>
+</div>
+
+<!-- 일일 보고 -->
+<div class="page active" id="page-daily">
 <div class="container">
-  <div class="header">
-    <div class="dot"></div>
-    <h1>월드킹 계양점</h1>
-    <span class="hbadge">매출 대시보드</span>
-  </div>
   <div class="sec">
-    <div class="sec-title">목표 설정</div>
+    <div class="sec-label">오늘 매출 입력</div>
     <div class="card">
-      <div class="g3" style="margin-bottom:14px;">
-        <div class="field"><label>기준 월</label><select id="month"></select></div>
-        <div class="field"><label>월 목표 매출 (원)</label><input type="number" id="goal" placeholder="예: 30000000" oninput="calc()"/></div>
-        <div class="field"><label>총 영업일 수</label><input type="number" id="bizdays" placeholder="예: 26" oninput="calc()"/></div>
+      <div class="g3" style="margin-bottom:10px;">
+        <div class="field"><label>보고 날짜</label><input type="date" id="d-date"/></div>
+        <div class="field"><label>요일 구분</label><select id="d-daytype"><option>평일</option><option>주말/공휴일</option></select></div>
+        <div class="field"><label>담당자</label><input type="text" id="d-staff" placeholder="이름 입력"/></div>
       </div>
-      <hr class="divider">
-      <div class="g4">
-        <div class="field"><label>현재 누적 매출 (원)</label><input type="number" id="actual" placeholder="0" oninput="calc()"/></div>
-        <div class="field"><label>경과 영업일</label><input type="number" id="elapsed" placeholder="0" oninput="calc()"/></div>
-        <div class="field"><label>주말 매출 비중 (%)</label><input type="number" id="wratio" placeholder="예: 60" oninput="calc()"/></div>
-        <div class="field"><label>잔여 주말일 수</label><input type="number" id="wdays" placeholder="예: 6" oninput="calc()"/></div>
+      <div class="divider"></div>
+      <div class="g3" style="margin-bottom:10px;">
+        <div class="field"><label>일 매출 (원)</label><input type="number" id="d-sales" placeholder="0" oninput="dailyCalc()"/></div>
+        <div class="field"><label>입금 금액 (원)</label><input type="number" id="d-deposit" placeholder="0" oninput="dailyCalc()"/></div>
+        <div class="field"><label>실현금 (원)</label><input type="number" id="d-cash" placeholder="0" oninput="dailyCalc()"/></div>
       </div>
+      <div class="g3" style="margin-bottom:10px;">
+        <div class="field"><label>이벤트 매출 (원)</label><input type="number" id="d-event" placeholder="0" oninput="dailyCalc()"/></div>
+        <div class="field"><label>어린이집 매출 (원)</label><input type="number" id="d-kinder" placeholder="0" oninput="dailyCalc()"/></div>
+        <div class="field"><label>쿠폰 장수</label><input type="number" id="d-coupon" placeholder="0" oninput="dailyCalc()"/></div>
+      </div>
+      <div class="divider"></div>
+      <div class="g2">
+        <div class="field"><label>누적 매출 (원, 이번달 오늘까지)</label><input type="number" id="d-accum" placeholder="0" oninput="dailyCalc()"/></div>
+        <div class="field"><label>특이사항</label><input type="text" id="d-memo" placeholder="예: 단체방문, 우천"/></div>
+      </div>
+    </div>
+    <button class="add-btn" onclick="addRecord()">+ 일자별 기록에 저장</button>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">오늘 요약</div>
+    <div class="g4">
+      <div class="metric"><div class="ml">일 매출</div><div class="mv" id="ds-sales">0원</div></div>
+      <div class="metric"><div class="ml">입금 vs 매출</div><div class="mv" id="ds-diff">—</div><div class="ms" id="ds-diff-sub"></div></div>
+      <div class="metric"><div class="ml">이벤트 비중</div><div class="mv" id="ds-eratio">0%</div></div>
+      <div class="metric"><div class="ml">쿠폰 사용</div><div class="mv" id="ds-coupon">0장</div></div>
     </div>
   </div>
+
   <div class="sec">
-    <div class="sec-title">진도율 현황</div>
-    <div class="g4" style="margin-bottom:12px;">
-      <div class="metric"><div class="ml">목표 진도율</div><div class="mv" id="trate">—</div><div class="ms">경과일 기준</div></div>
-      <div class="metric"><div class="ml">실제 진도율</div><div class="mv" id="arate">—</div><div class="ms" id="gap-text">—</div></div>
-      <div class="metric"><div class="ml">잔여 목표액</div><div class="mv" id="remain">—</div><div class="ms">달성 필요</div></div>
-      <div class="metric"><div class="ml">일 평균 필요액</div><div class="mv" id="dneed">—</div><div class="ms">잔여일 기준</div></div>
-    </div>
+    <div class="sec-label">월 진도율 (누적 기준)</div>
+    <div id="d-monthly-summary"><div class="placeholder">월 목표 관리 탭에서 목표를 먼저 설정하고, 누적 매출을 입력해주세요.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">카카오톡 보고 메시지</div>
+    <div class="msg-box" id="d-msg">숫자를 입력하면 메시지가 자동 생성됩니다.</div>
+    <button class="copy-btn" onclick="copyMsg()">메시지 복사하기</button>
+  </div>
+</div>
+</div>
+
+<!-- 일자별 기록 -->
+<div class="page" id="page-record">
+<div class="container">
+  <div class="sec">
+    <div class="sec-label">일별 목표 기준 설정</div>
     <div class="card">
-      <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--gray-400);margin-bottom:5px;">
-        <span>달성률</span><span id="plabel" style="font-weight:700;color:var(--gray-800);">0%</span>
+      <div class="g3">
+        <div class="field"><label>기준 월</label><select id="r-month"></select></div>
+        <div class="field"><label>월 목표 매출 (원)</label><input type="number" id="r-goal" placeholder="예: 30000000" oninput="renderTable()"/></div>
+        <div class="field"><label>영업일 수</label><input type="number" id="r-bizdays" placeholder="예: 26" oninput="renderTable()"/></div>
       </div>
-      <div class="prog-bg"><div class="prog-fill" id="pbar" style="width:0%;background:var(--blue);"></div></div>
-      <div class="prog-labels"><span>0%</span><span>목표 진도율 <strong id="ptlabel">—</strong></span><span>100%</span></div>
     </div>
   </div>
+
   <div class="sec">
-    <div class="sec-title">수치 표</div>
+    <div class="sec-label">월간 요약</div>
+    <div id="r-summary"><div class="placeholder">일일 보고 탭에서 기록을 저장하면 표시됩니다.</div></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">일자별 매출 기록표</div>
     <div class="card" style="overflow-x:auto;">
       <table>
-        <thead><tr><th style="width:26%;">항목</th><th style="width:20%;">목표</th><th style="width:20%;">실적</th><th style="width:14%;">달성률</th><th style="width:20%;">상태</th></tr></thead>
-        <tbody id="tbody"><tr><td colspan="5" class="empty">숫자를 입력하면 표가 채워집니다</td></tr></tbody>
+        <thead>
+          <tr>
+            <th style="width:11%;">날짜</th>
+            <th style="width:8%;">구분</th>
+            <th style="width:13%;">일 매출</th>
+            <th style="width:12%;">입금</th>
+            <th style="width:11%;">실현금</th>
+            <th style="width:10%;">이벤트</th>
+            <th style="width:7%;">쿠폰</th>
+            <th style="width:13%;">목표대비 %</th>
+            <th style="width:10%;">누적달성률</th>
+            <th style="width:5%;">삭제</th>
+          </tr>
+        </thead>
+        <tbody id="r-tbody">
+          <tr><td colspan="10" class="placeholder">일일 보고 탭에서 "+ 일자별 기록에 저장" 버튼을 눌러주세요</td></tr>
+        </tbody>
       </table>
     </div>
   </div>
-  <div class="sec">
-    <div class="sec-title">관리자 액션 가이드</div>
-    <div id="guide"><p class="empty" style="background:#fff;border-radius:var(--radius);padding:1.5rem;">목표와 실적을 입력하면 가이드가 생성됩니다.</p></div>
-  </div>
-  <footer>월드킹 계양점 매출 대시보드 · 관리자 전용</footer>
 </div>
+</div>
+
+<!-- 월 목표 관리 -->
+<div class="page" id="page-monthly">
+<div class="container">
+  <div class="sec">
+    <div class="sec-label">월 목표 설정</div>
+    <div class="card">
+      <div class="g3" style="margin-bottom:10px;">
+        <div class="field"><label>기준 월</label><select id="m-month"></select></div>
+        <div class="field"><label>월 목표 매출 (원)</label><input type="number" id="m-goal" placeholder="예: 30000000" oninput="monthlyCalc()"/></div>
+        <div class="field"><label>총 영업일 수</label><input type="number" id="m-bizdays" placeholder="예: 26" oninput="monthlyCalc()"/></div>
+      </div>
+      <div class="divider"></div>
+      <div class="g4">
+        <div class="field"><label>현재 누적 매출 (원)</label><input type="number" id="m-actual" placeholder="0" oninput="monthlyCalc()"/></div>
+        <div class="field"><label>경과 영업일</label><input type="number" id="m-elapsed" placeholder="0" oninput="monthlyCalc()"/></div>
+        <div class="field"><label>주말 매출 비중 (%)</label><input type="number" id="m-wratio" placeholder="예: 60" oninput="monthlyCalc()"/></div>
+        <div class="field"><label>잔여 주말일 수</label><input type="number" id="m-wdays" placeholder="예: 6" oninput="monthlyCalc()"/></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">진도율 현황</div>
+    <div class="g4" style="margin-bottom:10px;">
+      <div class="metric"><div class="ml">목표 진도율</div><div class="mv" id="m-trate">—</div><div class="ms" style="color:var(--muted);">경과일 기준</div></div>
+      <div class="metric"><div class="ml">실제 달성률</div><div class="mv" id="m-arate">—</div><div class="ms" id="m-gap"></div></div>
+      <div class="metric"><div class="ml">잔여 목표액</div><div class="mv" id="m-remain">—</div><div class="ms" style="color:var(--muted);">달성 필요</div></div>
+      <div class="metric"><div class="ml">일 평균 필요액</div><div class="mv" id="m-dneed">—</div><div class="ms" style="color:var(--muted);">잔여일 기준</div></div>
+    </div>
+    <div class="card" style="padding:13px 16px;">
+      <div class="prog-header"><span style="color:var(--muted);font-size:13px;">달성률</span><span class="big-rate" id="m-plabel">0%</span></div>
+      <div class="prog-wrap"><div class="prog-bar" id="m-pbar" style="width:0%;background:var(--primary-mid);"></div></div>
+      <div class="prog-labels"><span>0%</span><span>목표 진도율 <strong id="m-ptlabel">—</strong></span><span>100%</span></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">수치 표</div>
+    <div class="card" style="overflow-x:auto;">
+      <table>
+        <thead><tr><th style="width:26%;">항목</th><th style="width:20%;">목표</th><th style="width:20%;">실적</th><th style="width:14%;">달성률</th><th style="width:20%;">상태</th></tr></thead>
+        <tbody id="m-tbody"><tr><td colspan="5" class="placeholder">숫자를 입력하면 표가 채워집니다</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-label">관리자 액션 가이드</div>
+    <div id="m-guide"><div class="placeholder">목표와 실적을 입력하면 가이드가 생성됩니다.</div></div>
+  </div>
+</div>
+</div>
+
 <script>
-const sel=document.getElementById('month');
+function switchTab(t){
+  const map={daily:0,record:1,monthly:2};
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',i===map[t]));
+  document.querySelectorAll('.page').forEach((el,i)=>el.classList.toggle('active',i===map[t]));
+  if(t==='record')renderTable();
+}
 const now=new Date();
-for(let i=0;i<6;i++){const d=new Date(now.getFullYear(),now.getMonth()-i,1);const o=document.createElement('option');o.textContent=`${d.getFullYear()}년 ${d.getMonth()+1}월`;sel.appendChild(o);}
-function fw(n){return Math.round(n).toLocaleString('ko-KR')+'원';}
-function fm(n){return Math.round(n/10000).toLocaleString('ko-KR')+'만원';}
+['m-month','r-month'].forEach(id=>{
+  const sel=document.getElementById(id);
+  for(let i=0;i<6;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+    const o=document.createElement('option');
+    o.textContent=`${d.getFullYear()}년 ${d.getMonth()+1}월`;
+    sel.appendChild(o);
+  }
+});
+document.getElementById('d-date').value=now.toISOString().split('T')[0];
+
+function fmt(n){return Math.round(n).toLocaleString('ko-KR')+'원';}
+function fmtM(n){return Math.round(n/10000).toLocaleString('ko-KR')+'만원';}
+function fmtK(n){return Math.round(n/10000).toLocaleString('ko-KR')+'만';}
+function getDateStr(){
+  const v=document.getElementById('d-date').value;
+  if(!v)return '날짜 미입력';
+  const d=new Date(v);
+  const days=['일','월','화','수','목','금','토'];
+  return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 (${days[d.getDay()]})`;
+}
 function sb(r){if(r>=100)return '<span class="badge bs">달성</span>';if(r>=90)return '<span class="badge bw">근접</span>';if(r>=70)return '<span class="badge bw">주의</span>';return '<span class="badge bd">미달</span>';}
-function calc(){
-  const goal=parseInt(document.getElementById('goal').value)||0;
-  const actual=parseInt(document.getElementById('actual').value)||0;
-  const biz=parseInt(document.getElementById('bizdays').value)||0;
-  const elapsed=parseInt(document.getElementById('elapsed').value)||0;
-  const wratio=parseFloat(document.getElementById('wratio').value)||60;
-  const wdays=parseInt(document.getElementById('wdays').value)||0;
-  if(!goal||!biz||!elapsed){document.getElementById('guide').innerHTML='<div class="alert aw"><div class="aicon">▲</div><div><div class="atitle">입력 필요</div><div class="abody">목표 매출, 영업일 수, 경과일을 모두 입력해주세요.</div></div></div>';return;}
-  const rem=biz-elapsed;const tr=Math.round(elapsed/biz*100);const ar=goal>0?Math.round(actual/goal*100):0;const gap=ar-tr;const remAmt=Math.max(goal-actual,0);const dn=rem>0?remAmt/rem:0;const da=elapsed>0?actual/elapsed:0;
-  document.getElementById('trate').textContent=tr+'%';document.getElementById('arate').textContent=ar+'%';document.getElementById('remain').textContent=fm(remAmt);document.getElementById('dneed').textContent=fm(dn)+'/일';
-  const gt=document.getElementById('gap-text');if(gap>=0){gt.textContent='+'+gap+'%p 앞서는 중';gt.style.color='var(--green)';}else{gt.textContent=gap+'%p 뒤처진 중';gt.style.color='var(--red)';}
-  const pb=document.getElementById('pbar');pb.style.width=Math.min(ar,100)+'%';pb.style.background=gap>=0?'var(--green)':gap>=-10?'var(--amber)':'var(--red)';
-  document.getElementById('plabel').textContent=ar+'%';document.getElementById('ptlabel').textContent=tr+'%';
-  const wg=goal*(wratio/100),wa=actual*(wratio/100);const dg=goal*((100-wratio)/100),da2=actual*((100-wratio)/100);
-  const rows=[['총 매출',fw(goal),fw(actual),ar+'%',sb(ar)],['일평균 실적',fm(da)+'/일',fm(dn)+'/일 필요','—',''],['주말 매출 (추정)',fm(wg),fm(wa),Math.round(wa/wg*100)+'%',sb(Math.round(wa/wg*100))],['평일 매출 (추정)',fm(dg),fm(da2),Math.round(da2/dg*100)+'%',sb(Math.round(da2/dg*100))],['잔여 필요액','—',fm(remAmt),'—',rem>0?rem+'일 남음':'마감']];
-  document.getElementById('tbody').innerHTML=rows.map(r=>`<tr>${r.map((c,i)=>`<td${i===0?' style="color:var(--gray-400);font-weight:500;"':''}>${c}</td>`).join('')}</tr>`).join('');
-  const gs=[];function ag(t,title,body){gs.push({t,title,body});}
-  if(ar>=100){ag('success','목표 달성!','이번 달 목표를 달성했습니다. 다음 달 목표 상향을 검토하세요.');}
-  else if(gap<=-20){ag('danger','긴급 — 대폭 뒤처진 상태',`진도율이 목표보다 ${Math.abs(gap)}%p 낮습니다.`);if(wdays>0){const wn=remAmt*(wratio/100)/wdays;ag('danger','주말 집중 공략 필요',`잔여 주말 ${wdays}일에 일평균 ${Math.round(wn/10000).toLocaleString()}만원 이상 달성해야 합니다.`);}ag('warning','평일 — 어린이집·단체 유치','어린이집 단체 방문 및 생일파티 패키지 단기 할인을 평일에 집중 운영하세요.');}
-  else if(gap<=-10){ag('warning','주의 — 진도율 뒤처짐',`목표 대비 ${Math.abs(gap)}%p 부족합니다.`);if(wdays>0)ag('warning','주말 이벤트 강화 권장',`잔여 주말 ${wdays}일을 활용해 SNS 이벤트·쿠폰으로 방문객을 늘리세요.`);ag('warning','어린이집 매출 점검','계약 입금 확인 및 추가 계약 기관을 발굴하세요.');}
-  else if(gap<0){ag('warning','소폭 뒤처짐 — 유지 관리',`만회 가능 범위입니다. 일평균 ${fm(dn)}을 유지하세요.`);}
-  else{ag('success','순항 중',`목표 진도율을 ${gap}%p 앞서고 있습니다.`);}
-  if(rem<=5&&ar<90)ag('danger',`마감 ${rem}일 전 — 마지막 스퍼트`,'카카오 채널 긴급 프로모션으로 잔여 목표를 채우세요.');
-  const mk={success:'✓',warning:'▲',danger:'!'};
-  document.getElementById('guide').innerHTML=gs.map(g=>`<div class="alert a${g.t[0]}"><div class="aicon">${mk[g.t]}</div><div><div class="atitle">${g.title}</div><div class="abody">${g.body}</div></div></div>`).join('');
+
+let records=[];
+
+function addRecord(){
+  const sales=parseInt(document.getElementById('d-sales').value)||0;
+  if(!sales){alert('일 매출을 입력해주세요.');return;}
+  const date=document.getElementById('d-date').value||now.toISOString().split('T')[0];
+  const rec={
+    date,
+    daytype:document.getElementById('d-daytype').value,
+    sales,
+    deposit:parseInt(document.getElementById('d-deposit').value)||0,
+    cash:parseInt(document.getElementById('d-cash').value)||0,
+    event:parseInt(document.getElementById('d-event').value)||0,
+    kinder:parseInt(document.getElementById('d-kinder').value)||0,
+    coupon:parseInt(document.getElementById('d-coupon').value)||0,
+    accum:parseInt(document.getElementById('d-accum').value)||0,
+    memo:document.getElementById('d-memo').value,
+  };
+  const idx=records.findIndex(r=>r.date===date);
+  if(idx>=0){if(confirm('같은 날짜 기록이 있습니다. 덮어쓸까요?'))records[idx]=rec;else return;}
+  else records.push(rec);
+  records.sort((a,b)=>a.date.localeCompare(b.date));
+  alert('저장되었습니다! 일자별 기록 탭에서 확인하세요.');
+}
+
+function deleteRecord(i){
+  if(confirm('이 기록을 삭제할까요?')){records.splice(i,1);renderTable();}
+}
+
+function renderTable(){
+  const goal=parseInt(document.getElementById('r-goal').value)||0;
+  const bizdays=parseInt(document.getElementById('r-bizdays').value)||0;
+  const dailyGoal=goal>0&&bizdays>0?Math.round(goal/bizdays):0;
+  const tbody=document.getElementById('r-tbody');
+
+  if(records.length===0){
+    tbody.innerHTML='<tr><td colspan="10" class="placeholder">일일 보고 탭에서 "+ 일자별 기록에 저장" 버튼을 눌러주세요</td></tr>';
+    document.getElementById('r-summary').innerHTML='<div class="placeholder">일일 보고 탭에서 기록을 저장하면 표시됩니다.</div>';
+    return;
+  }
+
+  let totalSales=0,totalDeposit=0,totalCash=0,totalEvent=0,totalCoupon=0;
+  records.forEach(r=>{totalSales+=r.sales;totalDeposit+=r.deposit;totalCash+=r.cash;totalEvent+=r.event;totalCoupon+=r.coupon;});
+  const accumRate=goal>0?Math.round(totalSales/goal*100):0;
+  const rateColor=accumRate>=100?'var(--green)':accumRate>=70?'var(--amber)':'var(--red)';
+  const rateBarColor=accumRate>=100?'var(--green-mid)':accumRate>=70?'var(--amber-mid)':'var(--red-mid)';
+
+  document.getElementById('r-summary').innerHTML=`
+    <div class="g4" style="margin-bottom:10px;">
+      <div class="metric"><div class="ml">누적 매출 합계</div><div class="mv">${fmtM(totalSales)}</div></div>
+      <div class="metric"><div class="ml">월 목표 달성률</div><div class="mv" style="color:${rateColor};">${goal>0?accumRate+'%':'—'}</div></div>
+      <div class="metric"><div class="ml">총 입금 합계</div><div class="mv">${fmtM(totalDeposit)}</div></div>
+      <div class="metric"><div class="ml">총 쿠폰 합계</div><div class="mv">${totalCoupon}장</div></div>
+    </div>
+    ${goal>0?`<div class="card" style="padding:12px 16px;">
+      <div class="prog-header"><span style="color:var(--muted);font-size:12px;">월 목표 달성률 (누적)</span><span style="font-weight:700;font-size:18px;color:${rateColor};">${accumRate}%</span></div>
+      <div class="prog-wrap"><div class="prog-bar" style="width:${Math.min(accumRate,100)}%;background:${rateBarColor};"></div></div>
+      <div class="prog-labels"><span>0%</span><span>목표 ${fmtM(goal)}</span><span>100%</span></div>
+    </div>`:''}`;
+
+  let cumSales=0;
+  tbody.innerHTML=records.map((r,i)=>{
+    cumSales+=r.sales;
+    const vsGoal=dailyGoal>0?Math.round(r.sales/dailyGoal*100):0;
+    const cumRate=goal>0?Math.round(cumSales/goal*100):0;
+    const vsColor=vsGoal>=100?'var(--green)':vsGoal>=80?'var(--amber)':'var(--red)';
+    const cumColor=cumRate>=100?'var(--green)':cumRate>=70?'var(--amber)':'var(--red)';
+    const d=new Date(r.date);
+    const days=['일','월','화','수','목','금','토'];
+    const dateStr=`${d.getMonth()+1}/${d.getDate()}(${days[d.getDay()]})`;
+    return `<tr>
+      <td style="font-weight:500;">${dateStr}</td>
+      <td><span style="font-size:10px;color:var(--muted);">${r.daytype==='주말/공휴일'?'주말':'평일'}</span></td>
+      <td style="font-weight:500;">${fmtK(r.sales)}</td>
+      <td>${r.deposit>0?fmtK(r.deposit):'—'}</td>
+      <td>${r.cash>0?fmtK(r.cash):'—'}</td>
+      <td>${r.event>0?fmtK(r.event):'—'}</td>
+      <td>${r.coupon>0?r.coupon+'장':'—'}</td>
+      <td>
+        <div style="font-weight:700;color:${vsColor};font-size:13px;">${dailyGoal>0?vsGoal+'%':'—'}</div>
+        ${dailyGoal>0?`<div class="mini-prog"><div class="mini-bar" style="width:${Math.min(vsGoal,100)}%;background:${vsColor};"></div></div>`:''}
+      </td>
+      <td>
+        <div style="font-weight:700;color:${cumColor};font-size:13px;">${goal>0?cumRate+'%':'—'}</div>
+        ${goal>0?`<div class="mini-prog"><div class="mini-bar" style="width:${Math.min(cumRate,100)}%;background:${cumColor};"></div></div>`:''}
+      </td>
+      <td><button class="del-btn" onclick="deleteRecord(${i})">삭제</button></td>
+    </tr>`;
+  }).join('');
+}
+
+function dailyCalc(){
+  const sales=parseInt(document.getElementById('d-sales').value)||0;
+  const deposit=parseInt(document.getElementById('d-deposit').value)||0;
+  const cash=parseInt(document.getElementById('d-cash').value)||0;
+  const event=parseInt(document.getElementById('d-event').value)||0;
+  const kinder=parseInt(document.getElementById('d-kinder').value)||0;
+  const coupon=parseInt(document.getElementById('d-coupon').value)||0;
+  const accum=parseInt(document.getElementById('d-accum').value)||0;
+  const memo=document.getElementById('d-memo').value;
+  const staff=document.getElementById('d-staff').value||'___';
+  const daytype=document.getElementById('d-daytype').value;
+
+  document.getElementById('ds-sales').textContent=fmt(sales);
+  document.getElementById('ds-coupon').textContent=coupon+'장';
+  document.getElementById('ds-eratio').textContent=sales>0?Math.round(event/sales*100)+'%':'0%';
+  const diff=deposit-sales;
+  const diffEl=document.getElementById('ds-diff');
+  const diffSub=document.getElementById('ds-diff-sub');
+  if(deposit>0){
+    diffEl.textContent=(diff>=0?'+':'')+fmtK(diff);
+    diffEl.style.color=diff>=0?'var(--green)':'var(--red)';
+    diffSub.textContent=diff>=0?'초과 입금':'미입금 있음';
+    diffSub.style.color=diff>=0?'var(--green)':'var(--red)';
+  }else{diffEl.textContent='—';diffSub.textContent='';}
+
+  const mGoalVal=parseInt(document.getElementById('m-goal').value)||0;
+  const mBizVal=parseInt(document.getElementById('m-bizdays').value)||0;
+  const mElapsedVal=parseInt(document.getElementById('m-elapsed').value)||0;
+  if(accum>0&&mGoalVal>0){
+    const arate=Math.round(accum/mGoalVal*100);
+    const trate=mBizVal>0&&mElapsedVal>0?Math.round(mElapsedVal/mBizVal*100):0;
+    const gap=arate-trate;
+    const remain=Math.max(mGoalVal-accum,0);
+    const rc=gap>=0?'var(--green)':gap>=-10?'var(--amber)':'var(--red)';
+    const rbc=gap>=0?'var(--green-mid)':gap>=-10?'var(--amber-mid)':'var(--red-mid)';
+    document.getElementById('d-monthly-summary').innerHTML=`
+      <div class="highlight-card">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+          <span style="font-size:13px;color:var(--primary);font-weight:500;">이번달 누적 매출</span>
+          <span style="font-size:20px;font-weight:700;color:var(--primary);">${fmt(accum)}</span>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;">
+          <span style="font-size:12px;color:var(--muted);">달성률</span>
+          <span style="font-size:17px;font-weight:700;color:${rc};">${arate}% ${gap!==0?'('+(gap>=0?'+':'')+gap+'%p)':''}</span>
+        </div>
+        <div style="background:rgba(255,255,255,0.5);border-radius:6px;height:8px;overflow:hidden;margin-bottom:8px;">
+          <div style="height:100%;border-radius:6px;background:${rbc};width:${Math.min(arate,100)}%;transition:width .4s;"></div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;">
+          <span style="font-size:12px;color:var(--muted);">잔여 목표</span>
+          <span style="font-size:13px;font-weight:500;color:var(--primary);">${fmtM(remain)}</span>
+        </div>
+      </div>`;
+  }else{document.getElementById('d-monthly-summary').innerHTML='<div class="placeholder">누적 매출과 월 목표(월 목표 관리 탭)를 입력하면 진도율이 표시됩니다.</div>';}
+
+  if(sales===0){document.getElementById('d-msg').textContent='숫자를 입력하면 메시지가 자동 생성됩니다.';return;}
+  let msg=`[월드킹 계양점] 일일 매출 보고\n━━━━━━━━━━━━━━\n📅 ${getDateStr()} (${daytype})\n\n💰 매출 현황\n`;
+  msg+=`• 일 매출: ${fmt(sales)}\n• 입금 금액: ${deposit>0?fmt(deposit):'미입력'}\n• 실현금: ${cash>0?fmt(cash):'미입력'}\n`;
+  if(event>0)msg+=`• 이벤트 매출: ${fmt(event)}\n`;
+  if(kinder>0)msg+=`• 어린이집 매출: ${fmt(kinder)}\n`;
+  if(coupon>0)msg+=`• 쿠폰 사용: ${coupon}장\n`;
+  if(accum>0){
+    msg+=`━━━━━━━━━━━━━━\n📊 누적 매출: ${fmt(accum)}\n`;
+    if(mGoalVal>0)msg+=`🎯 월 목표 달성률: ${Math.round(accum/mGoalVal*100)}%\n`;
+  }
+  if(memo)msg+=`\n📝 특이사항: ${memo}\n`;
+  msg+=`\n보고자: ${staff}`;
+  document.getElementById('d-msg').textContent=msg;
+}
+
+function monthlyCalc(){
+  const goal=parseInt(document.getElementById('m-goal').value)||0;
+  const actual=parseInt(document.getElementById('m-actual').value)||0;
+  const biz=parseInt(document.getElementById('m-bizdays').value)||0;
+  const elapsed=parseInt(document.getElementById('m-elapsed').value)||0;
+  const wratio=parseFloat(document.getElementById('m-wratio').value)||60;
+  const wdays=parseInt(document.getElementById('m-wdays').value)||0;
+  if(!goal||!biz||!elapsed){
+    document.getElementById('m-guide').innerHTML='<div class="alert aw"><div style="color:var(--amber);font-weight:700;flex-shrink:0;font-size:14px;">▲</div><div><div style="font-weight:700;color:var(--amber);margin-bottom:2px;">입력 필요</div><div style="font-size:12px;">목표 매출, 영업일 수, 경과일을 모두 입력해주세요.</div></div></div>';
+    return;
+  }
+  const remaining=biz-elapsed;
+  const trate=Math.round(elapsed/biz*100);
+  const arate=goal>0?Math.round(actual/goal*100):0;
+  const gap=arate-trate;
+  const remainAmt=Math.max(goal-actual,0);
+  const dneed=remaining>0?remainAmt/remaining:0;
+  const dactual=elapsed>0?actual/elapsed:0;
+  document.getElementById('m-trate').textContent=trate+'%';
+  document.getElementById('m-arate').textContent=arate+'%';
+  document.getElementById('m-remain').textContent=fmtM(remainAmt);
+  document.getElementById('m-dneed').textContent=fmtM(dneed)+'/일';
+  const gapEl=document.getElementById('m-gap');
+  if(gap>=0){gapEl.textContent='+'+gap+'%p 앞서는 중';gapEl.style.color='var(--green)';}
+  else{gapEl.textContent=gap+'%p 뒤처진 중';gapEl.style.color='var(--red)';}
+  document.getElementById('m-pbar').style.width=Math.min(arate,100)+'%';
+  document.getElementById('m-pbar').style.background=gap>=0?'var(--green-mid)':gap>=-10?'var(--amber-mid)':'var(--red-mid)';
+  document.getElementById('m-plabel').textContent=arate+'%';
+  document.getElementById('m-ptlabel').textContent=trate+'%';
+  const wgoal=goal*(wratio/100),wact=actual*(wratio/100);
+  const dgoal=goal*((100-wratio)/100),dact=actual*((100-wratio)/100);
+  const rows=[
+    ['총 매출',fmt(goal),fmt(actual),arate+'%',sb(arate)],
+    ['일평균 실적',fmtM(dactual)+'/일',fmtM(dneed)+'/일 필요','—',''],
+    ['주말 매출(추정)',fmtM(wgoal),fmtM(wact),Math.round(wact/wgoal*100)+'%',sb(Math.round(wact/wgoal*100))],
+    ['평일 매출(추정)',fmtM(dgoal),fmtM(dact),Math.round(dact/dgoal*100)+'%',sb(Math.round(dact/dgoal*100))],
+    ['잔여 필요액','—',fmtM(remainAmt),'—',remaining>0?remaining+'일 남음':'마감'],
+  ];
+  document.getElementById('m-tbody').innerHTML=rows.map(r=>`<tr>${r.map((c,i)=>`<td${i===0?' style="font-weight:500;color:var(--muted);"':''}>${c}</td>`).join('')}</tr>`).join('');
+  const gs=[];
+  function ag(t,title,body){gs.push({t,title,body});}
+  if(arate>=100){ag('s','목표 달성!','이번 달 목표를 달성했습니다. 다음 달 목표 상향을 검토하세요.');}
+  else if(gap<=-20){
+    ag('d','긴급 — 대폭 뒤처진 상태',`진도율이 목표보다 ${Math.abs(gap)}%p 낮습니다. 즉각적인 매출 부양이 필요합니다.`);
+    if(wdays>0){const wn=remainAmt*(wratio/100)/wdays;ag('d','주말 집중 공략 필요',`잔여 주말 ${wdays}일에 일평균 ${Math.round(wn/10000).toLocaleString()}만원 이상 달성해야 합니다.`);}
+    ag('w','평일 — 어린이집·단체 유치','어린이집 단체 방문 및 생일파티 패키지 단기 할인을 평일에 집중 운영하세요.');
+  }else if(gap<=-10){
+    ag('w','주의 — 진도율 뒤처짐',`목표 대비 ${Math.abs(gap)}%p 부족합니다. 이번 주 안에 만회 전략을 실행하세요.`);
+    if(wdays>0)ag('w','주말 이벤트 강화 권장',`잔여 주말 ${wdays}일을 활용해 SNS 이벤트·쿠폰으로 방문객을 늘리세요.`);
+    ag('w','어린이집 매출 점검','어린이집 계약 입금이 정상 처리됐는지 확인하고 추가 계약 기관을 발굴하세요.');
+  }else if(gap<0){
+    ag('w','소폭 뒤처짐',`목표 대비 ${Math.abs(gap)}%p 부족하지만 만회 가능 범위입니다. 일평균 ${Math.round(dneed/10000).toLocaleString()}만원을 유지하세요.`);
+  }else{ag('s','순항 중',`목표 진도율을 ${gap}%p 앞서고 있습니다. 현재 페이스를 유지하세요.`);}
+  if(remaining<=5&&arate<90)ag('d',`마감 ${remaining}일 전 — 마지막 스퍼트`,'카카오 채널 긴급 프로모션, 쿠폰 발송으로 잔여 목표를 채우세요.');
+  const cfg={
+    d:{cls:'ad',ic:'!',bg:'var(--red-mid)',tc:'var(--red)'},
+    w:{cls:'aw',ic:'▲',bg:'var(--amber-mid)',tc:'var(--amber)'},
+    s:{cls:'as',ic:'✓',bg:'var(--green-mid)',tc:'var(--green)'}
+  };
+  document.getElementById('m-guide').innerHTML=gs.map(g=>`
+    <div class="alert ${cfg[g.t].cls}">
+      <div style="width:20px;height:20px;border-radius:50%;background:${cfg[g.t].bg};color:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0;">${cfg[g.t].ic}</div>
+      <div><div style="font-weight:700;color:${cfg[g.t].tc};margin-bottom:2px;">${g.title}</div><div style="font-size:12px;">${g.body}</div></div>
+    </div>`).join('');
+}
+
+function copyMsg(){
+  const text=document.getElementById('d-msg').textContent;
+  if(text.includes('숫자를 입력'))return;
+  navigator.clipboard.writeText(text).then(()=>{
+    const btn=document.querySelector('.copy-btn');
+    btn.textContent='복사 완료!';
+    setTimeout(()=>btn.textContent='메시지 복사하기',2000);
+  });
 }
 </script>
 </body>
