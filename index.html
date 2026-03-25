@@ -294,14 +294,29 @@ function sb(r){
   return '<span class="badge bd">미달</span>';
 }
 function saveGoal(){
-  localStorage.setItem('wk_goal',document.getElementById('m-goal').value||'');
-  localStorage.setItem('wk_bizdays',document.getElementById('m-bizdays').value||'');
+  const goal=document.getElementById('m-goal').value||'';
+  const bizdays=document.getElementById('m-bizdays').value||'';
+  localStorage.setItem('wk_goal',goal);
+  localStorage.setItem('wk_bizdays',bizdays);
+  if(goal&&bizdays){
+    fetch(SHEET_URL,{method:'POST',body:JSON.stringify({type:'save_goal',goal:parseInt(goal),bizdays:parseInt(bizdays)})}).catch(()=>{});
+  }
 }
-function loadGoal(){
-  const g=localStorage.getItem('wk_goal');
-  const b=localStorage.getItem('wk_bizdays');
-  if(g)document.getElementById('m-goal').value=g;
-  if(b)document.getElementById('m-bizdays').value=b;
+function loadGoal(goalFromSheet, bizdaysFromSheet){
+  if(goalFromSheet){
+    document.getElementById('m-goal').value=goalFromSheet;
+    localStorage.setItem('wk_goal',goalFromSheet);
+  } else {
+    const g=localStorage.getItem('wk_goal');
+    if(g)document.getElementById('m-goal').value=g;
+  }
+  if(bizdaysFromSheet){
+    document.getElementById('m-bizdays').value=bizdaysFromSheet;
+    localStorage.setItem('wk_bizdays',bizdaysFromSheet);
+  } else {
+    const b=localStorage.getItem('wk_bizdays');
+    if(b)document.getElementById('m-bizdays').value=b;
+  }
 }
 function setSyncStatus(ok){
   const el=document.getElementById('sync-status');
@@ -567,7 +582,6 @@ function copyMsg(){
     setTimeout(()=>btn.textContent='메시지 복사하기',2000);
   });
 }
-loadGoal();
 loadRecords();
 </script>
 </body>
