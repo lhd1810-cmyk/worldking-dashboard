@@ -245,20 +245,32 @@ let allRecords=[];
 // 현재 선택 월 기준 필터된 데이터
 let records=[];
 
-// ★ 선택된 월 키 반환 (예: "2026-04")
-function getSelectedMonthKey(){
+// ★ 선택된 연도/월 반환
+function getSelectedYearMonth(){
   const sel=document.getElementById('m-month');
   if(!sel||sel.selectedIndex<0)return null;
   const now=new Date();
   const d=new Date(now.getFullYear(),now.getMonth()-sel.selectedIndex,1);
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+  return {year:d.getFullYear(), month:d.getMonth()+1};
+}
+
+// ★ 날짜 문자열에서 연도/월 추출 (형식 무관)
+function parseDateYM(dateStr){
+  if(!dateStr)return null;
+  // "2026-03-24" 형식
+  const m1=String(dateStr).match(/(\d{4})[-./년\s]+(\d{1,2})/);
+  if(m1)return {year:parseInt(m1[1]),month:parseInt(m1[2])};
+  return null;
 }
 
 // ★ 전체 데이터에서 선택 월만 필터링
 function filterByMonth(){
-  const mk=getSelectedMonthKey();
-  if(!mk){records=[...allRecords];return;}
-  records=allRecords.filter(r=>r.date&&r.date.startsWith(mk));
+  const ym=getSelectedYearMonth();
+  if(!ym){records=[...allRecords];return;}
+  records=allRecords.filter(r=>{
+    const rym=parseDateYM(r.date);
+    return rym&&rym.year===ym.year&&rym.month===ym.month;
+  });
 }
 
 // 월 셀렉트 변경 시
