@@ -197,7 +197,7 @@ tr:last-child td{border-bottom:none;}
     <div class="sec-label">월 목표 설정 <span style="font-size:10px;color:var(--green);font-weight:400;">자동 저장</span></div>
     <div class="card">
       <div class="g3">
-        <div class="field"><label>기준 월</label><select id="m-month"></select></div>
+        <div class="field"><label>기준 월</label><select id="m-month" onchange="onMonthChange()"></select></div>
         <div class="field"><label>월 목표 매출 (원)</label><input type="number" id="m-goal" placeholder="예: 30000000" inputmode="numeric" oninput="saveGoal();monthlyCalc()"/></div>
         <div class="field"><label>총 영업일 수</label><input type="number" id="m-bizdays" placeholder="예: 26" inputmode="numeric" oninput="saveGoal();monthlyCalc()"/></div>
       </div>
@@ -239,7 +239,36 @@ tr:last-child td{border-bottom:none;}
 </div>
 <script>
 const SHEET_URL='https://script.google.com/macros/s/AKfycbzVLMLyCwpOIW-fplSxlanMISwDDQ5wLS3iuDt6gl1RcZOZYx7T6YQRK-EzM-a5Dbod/exec';
+
+// 전체 데이터 (모든 월)
+let allRecords=[];
+// 현재 선택 월 기준 필터된 데이터
 let records=[];
+
+// ★ 선택된 월 키 반환 (예: "2026-04")
+function getSelectedMonthKey(){
+  const sel=document.getElementById('m-month');
+  if(!sel||sel.selectedIndex<0)return null;
+  const now=new Date();
+  const d=new Date(now.getFullYear(),now.getMonth()-sel.selectedIndex,1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+
+// ★ 전체 데이터에서 선택 월만 필터링
+function filterByMonth(){
+  const mk=getSelectedMonthKey();
+  if(!mk){records=[...allRecords];return;}
+  records=allRecords.filter(r=>r.date&&r.date.startsWith(mk));
+}
+
+// 월 셀렉트 변경 시
+function onMonthChange(){
+  filterByMonth();
+  renderTable();
+  updateMonthlySummary();
+  monthlyCalc();
+}
+
 function switchTab(t){
   const map={daily:0,record:1,monthly:2};
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',i===map[t]));
@@ -248,6 +277,7 @@ function switchTab(t){
   if(t==='monthly')monthlyCalc();
   window.scrollTo(0,0);
 }
+
 const now=new Date();
 const mSel=document.getElementById('m-month');
 for(let i=0;i<6;i++){
@@ -256,6 +286,9 @@ for(let i=0;i<6;i++){
   o.textContent=`${d.getFullYear()}년 ${d.getMonth()+1}월`;
   mSel.appendChild(o);
 }
+// 기본값: 현재 월 (index 0)
+mSel.selectedIndex=0;
+
 document.getElementById('d-date').value=now.toISOString().split('T')[0];
 function fmt(n){return Math.round(n).toLocaleString('ko-KR')+'원';}
 function roundH(n){return Math.round(n/100)*100;}
@@ -299,13 +332,16 @@ function loadRecords(){
     .then(r=>r.json())
     .then(data=>{
       if(data.status==='ok'){
-        records=data.records.map(r=>({
+        // ★ allRecords에 전체 저장
+        allRecords=data.records.map(r=>({
           date:r.date,daytype:r.daytype,
           sales:parseInt(r.sales)||0,deposit:parseInt(r.deposit)||0,
           cash:parseInt(r.cash)||0,event:parseInt(r.event)||0,
           kinder:parseInt(r.kinder)||0,coupon:parseInt(r.coupon)||0,memo:r.memo||''
         }));
-        records.sort((a,b)=>new Date(a.date)-new Date(b.date));
+        allRecords.sort((a,b)=>new Date(a.date)-new Date(b.date));
+        // ★ 현재 선택 월로 필터링
+        filterByMonth();
         loadGoal(data.goal||0, data.bizdays||0);
         setSyncStatus(true);
         renderTable();
@@ -341,9 +377,11 @@ function addRecord(){
     .then(r=>r.json())
     .then(data=>{
       if(data.status==='ok'){
-        const idx=records.findIndex(r=>r.date===date);
-        if(idx>=0)records[idx]=rec;else records.push(rec);
-        records.sort((a,b)=>new Date(a.date)-new Date(b.date));
+        // ★ allRecords에 저장 후 필터링
+        const idx=allRecords.findIndex(r=>r.date===date);
+        if(idx>=0)allRecords[idx]=rec;else allRecords.push(rec);
+        allRecords.sort((a,b)=>new Date(a.date)-new Date(b.date));
+        filterByMonth();
         msg.textContent='✓ 저장됨';msg.style.color='var(--green)';
         setSyncStatus(true);updateMonthlySummary();
       }else{msg.textContent='저장 실패';msg.style.color='var(--red)';}
@@ -355,7 +393,13 @@ function deleteRecord(date){
   if(!confirm('이 기록을 삭제할까요?'))return;
   fetch(SHEET_URL,{method:'POST',body:JSON.stringify({type:'delete_record',date:date})})
     .then(r=>r.json())
-    .then(data=>{if(data.status==='ok'){records=records.filter(r=>r.date!==date);renderTable();updateMonthlySummary();}})
+    .then(data=>{
+      if(data.status==='ok'){
+        allRecords=allRecords.filter(r=>r.date!==date);
+        filterByMonth();
+        renderTable();updateMonthlySummary();
+      }
+    })
     .catch(()=>alert('삭제 실패. 다시 시도해주세요.'));
 }
 function updateMonthlySummary(){
@@ -470,6 +514,7 @@ function dailyCalc(){
     document.getElementById('ds-diff-sub').textContent='';
   }
   if(sales===0){document.getElementById('d-msg').textContent='숫자를 입력하면 메시지가 자동 생성됩니다.';return;}
+  // ★ 카카오 메시지 누적도 현재 월 데이터만 합산
   const prevTotal=records.reduce((s,r)=>s+r.sales,0);
   const todayAccum=prevTotal+sales;
   const goal=parseInt(document.getElementById('m-goal').value)||0;
